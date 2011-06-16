@@ -29,7 +29,7 @@ trait CxfProject extends BasicScalaProject {
       jaxbFriendlyClassLoader {
         try {
           for (wsdl <- wsdls) {
-            val args = wsdl2javaArgs(wsdl)
+            val args = wsdl.toArgs
             log.info("wsdl2java " + args.mkString(" "))
             new WSDLToJava(args.toArray).run(new ToolContext)
           }
@@ -49,19 +49,19 @@ trait CxfProject extends BasicScalaProject {
     def client = false
 
     def exsh = false
+
+    def toArgs: List[String] =
+      arg("-d", Some(generatedCxf.absolutePath)) :::
+        arg("-wsdlLocation", wsdlLocation) :::
+        arg("-p", packageNames) :::
+        arg("-client", client) :::
+        arg("-exsh", if (exsh) Some("true") else None) :::
+        List(wsdl.absolutePath)
   }
 
   def wsdls: Seq[WSDL]
 
   def generatedCxf = outputRootPath / "generated-cxf"
-
-  def wsdl2javaArgs(wsdl: WSDL): List[String] =
-    arg("-d", Some(generatedCxf.absolutePath)) :::
-      arg("-wsdlLocation", wsdl.wsdlLocation) :::
-      arg("-p", wsdl.packageNames) :::
-      arg("-client", wsdl.client) :::
-      arg("-exsh", if (wsdl.exsh) Some("true") else None) :::
-      List(wsdl.wsdl.absolutePath)
 
   def wsdl2javaAction = wsdlTojavaTask(wsdls) describedAs "Generates java from wsdl. see http://cxf.apache.org/docs/wsdl-to-java.html for more info"
 
