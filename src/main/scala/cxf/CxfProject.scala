@@ -5,6 +5,35 @@ import org.apache.cxf.tools.common.ToolContext
 import sbt._
 
 trait CxfProject extends BasicScalaProject {
+
+  // The stuff the plugin user has to implement
+  def wsdls: Seq[WSDL]
+
+  /**
+   * A class describing each WSDL file you want converted. Most of these arguments match the arguments from
+   * the wsdl2java tool from CXF: http://cxf.apache.org/docs/wsdl-to-java.html.
+   */
+  class WSDL(val wsdl: Path) {
+    val wsdlLocation: Option[String] = None
+
+    /**
+     * The primary namespace for the conversion. Results in "-p <value>" to be passed to wsdl2java. This argument
+     * will be passed after the packageNames arguments.
+     */
+    val packageName: Option[String] = None
+
+    /**
+     * A list of namespace aliases. Results in "-p <key>=<value>" to be passed to wsdl2java.
+     */
+    val packageNames: Seq[(String, String)] = Nil
+
+    val client = false
+
+    val exsh = false
+  }
+
+  // The shit
+
   /* otherwise jaxb will throw a tantrum */
   private def jaxbFriendlyClassLoader[A](f: => A): A = {
     val old = Thread.currentThread.getContextClassLoader
@@ -16,11 +45,9 @@ trait CxfProject extends BasicScalaProject {
     }
   }
 
-  private def arg(pre: String, a: Seq[String]) = if (a.isEmpty) Nil else pre :: a.toList
+  private def arg(pre: String, a: Seq[String]) = a.flatMap(pre :: _ :: Nil).toList
 
-  private def arg(pre: String, a: Option[String]) = a.toList.flatMap {
-    pre :: _ :: Nil
-  }
+  private def arg(pre: String, a: Option[String]) = a.toList.flatMap { pre :: _ :: Nil }
 
   private def arg(pre: String, a: Boolean) = if (a) List(pre) else Nil
 
@@ -29,7 +56,7 @@ trait CxfProject extends BasicScalaProject {
       jaxbFriendlyClassLoader {
         try {
           for (wsdl <- wsdls) {
-            val args = wsdl.toArgs
+            val args = toArgs(wsdl)
             log.info("wsdl2java " + args.mkString(" "))
             new WSDLToJava(args.toArray).run(new ToolContext)
           }
@@ -41,25 +68,15 @@ trait CxfProject extends BasicScalaProject {
     }
   }
 
-  class WSDL(val wsdl: Path) {
-    def wsdlLocation: Option[String] = None
-
-    def packageNames: Seq[String] = Nil
-
-    def client = false
-
-    def exsh = false
-
-    def toArgs: List[String] =
-      arg("-d", Some(generatedCxf.absolutePath)) :::
-        arg("-wsdlLocation", wsdlLocation) :::
-        arg("-p", packageNames) :::
-        arg("-client", client) :::
-        arg("-exsh", if (exsh) Some("true") else None) :::
-        List(wsdl.absolutePath)
+  def toArgs(wsdl: WSDL): List[String] = {
+    arg("-d", Some(generatedCxf.absolutePath)) :::
+      arg("-wsdlLocation", wsdl.wsdlLocation) :::
+      arg("-p", wsdl.packageNames.map(t => t._1 + "=" + t._2)) :::
+      arg("-p", wsdl.packageName) :::
+      arg("-client", wsdl.client) :::
+      arg("-exsh", if (wsdl.exsh) Some("true") else None) :::
+      List(wsdl.wsdl.absolutePath)
   }
-
-  def wsdls: Seq[WSDL]
 
   def generatedCxf = outputRootPath / "generated-cxf"
 
