@@ -12,7 +12,7 @@ object CxfPlugin extends Plugin {
     val wsdl2java = TaskKey[Seq[File]]("wsdl2java", "Generates java files from wsdls")
     val wsdls = SettingKey[Seq[Wsdl]]("wsdls", "wsdls to generate java files from")
     
-    case class Wsdl(file:File, args:String*)
+    case class Wsdl(file:File, args:Seq[String])
     
     val settings = Seq(
       ivyConfigurations += Config,
@@ -39,6 +39,8 @@ object CxfPlugin extends Plugin {
       sourceGenerators in Compile <+= wsdl2java)
 
     def callWsdl2java(args:Seq[String], classpath:Seq[File]){
+      // TODO: Use the built-in logging mechanism from SBT when I figure out how that work - trygve
+      println("WSDL: " + args)
       val classLoader = ClasspathUtilities.toLoader(classpath)
       val WSDLToJava = classLoader.loadClass("org.apache.cxf.tools.wsdlto.WSDLToJava")
       val ToolContext = classLoader.loadClass("org.apache.cxf.tools.common.ToolContext")
@@ -50,6 +52,13 @@ object CxfPlugin extends Plugin {
         Thread.currentThread.setContextClassLoader(classLoader)
         val instance = constructor.newInstance(args.toArray)
         run.invoke(instance, ToolContext.newInstance().asInstanceOf[AnyRef])
+      } catch {
+        case e =>
+          // TODO: Figure out if there is a better way to signal errors to SBT.
+          // Some of the CXF exceptions contain output that's proper to show to
+          // the user as it explains the error that ocurred.
+          e.printStackTrace
+          throw e
       } finally{
         Thread.currentThread.setContextClassLoader(oldContextClassLoader)
       }
