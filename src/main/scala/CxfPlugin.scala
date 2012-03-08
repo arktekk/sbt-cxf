@@ -13,8 +13,10 @@ object CxfPlugin extends Plugin {
     val wsdls = SettingKey[Seq[Wsdl]]("wsdls", "wsdls to generate java files from")
 
     case class Wsdl(file: File, args: Seq[String], key: Option[String] = None) {
+      val id = key.getOrElse(args.mkString.hashCode.abs).toString
+
       def outputDirectory(basedir: File) =
-        new File(basedir, key.getOrElse(args.mkString.hashCode.abs).toString).getAbsoluteFile
+        new File(basedir, id).getAbsoluteFile
     }
 
     val settings = Seq(
@@ -40,21 +42,27 @@ object CxfPlugin extends Plugin {
           val output = wsdl.outputDirectory(basedir)
           if(wsdl.file.lastModified() > output.lastModified()) {
             val args = Seq("-d", output.getAbsolutePath) ++ wsdl.args :+ wsdl.file.getAbsolutePath
-            IO.delete(output)
-            callWsdl2java(args, classpath)
-            (output ** "*.java").get
+            callWsdl2java(wsdl.id, output, args, classpath)
           }
-          else {
-            Seq.empty
-          }
+
+          val files = (output ** "*.java").get
+//          println(wsdl.id + ", files=" + files.length)
+          files
         }
-        x.flatten
+        val files = x.flatten
+//        println("files=" + files.length)
+        files
       },
       sourceGenerators in Compile <+= wsdl2java)
 
-    def callWsdl2java(args: Seq[String], classpath: Seq[File]) {
+    def callWsdl2java(id: String, output: File, args: Seq[String], classpath: Seq[File]) {
       // TODO: Use the built-in logging mechanism from SBT when I figure out how that work - trygve
-      println("WSDL: " + args)
+      println("WSDL: id=" + id + ", args=" + args)
+      println("Removing output directory...")
+      IO.delete(output)
+
+      println("Compiling WSDL...")
+      val start = System.currentTimeMillis()
       val classLoader = ClasspathUtilities.toLoader(classpath)
       val WSDLToJava = classLoader.loadClass("org.apache.cxf.tools.wsdlto.WSDLToJava")
       val ToolContext = classLoader.loadClass("org.apache.cxf.tools.common.ToolContext")
@@ -74,6 +82,8 @@ object CxfPlugin extends Plugin {
           e.printStackTrace
           throw e
       } finally {
+        val end = System.currentTimeMillis()
+        println("Compiled WSDL in " + (end - start) + "ms.");
         Thread.currentThread.setContextClassLoader(oldContextClassLoader)
       }
     }
