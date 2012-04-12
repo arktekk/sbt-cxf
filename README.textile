@@ -1,5 +1,4 @@
-This plugin for "sbt":https://github.com/harrah/xsbt will generate java-classes for web-service wsdls using
-"Apache CXF":http://cxf.apache.org/. For a simple example of the usage see https://github.com/arktekk/sbt-cxf-example.
+This plugin for "sbt":https://github.com/harrah/xsbt will generate java-classes for web-service wsdls using "Apache CXF":http://cxf.apache.org/. For a simple example of the usage see https://github.com/arktekk/sbt-cxf-example.
 
 h2. Minimal Setup
 
