@@ -1,0 +1,19 @@
+This plugin for "sbt":https://github.com/harrah/xsbt will generate java-classes for web-service wsdls using
+"Apache CXF":http://cxf.apache.org/. For a simple example of the usage see https://github.com/arktekk/sbt-cxf-example.
+
+h2. Minimal Setup
+
+project/plugins.sbt
+<pre>
+resolvers += "sonatype-snapshot-repo" at "https://oss.sonatype.org/content/repositories/snapshots"
+
+addSbtPlugin("no.arktekk" % "sbt-cxf" % "0.1-SNAPSHOT")
+</pre>
+
+build.sbt
+<pre>
+seq(cxf.settings : _*)
+
+cxf.wsdls := Seq(cxf.Wsdl(file(<path to wsdl-file>), Nil, None))
+</pre>
+
