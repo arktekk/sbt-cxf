@@ -6,10 +6,12 @@ h2. Minimal Setup
 project/plugins.sbt
 <pre>resolvers += "sonatype-snapshot-repo" at "https://oss.sonatype.org/content/repositories/snapshots"
 
-addSbtPlugin("no.arktekk" % "sbt-cxf" % "0.1-SNAPSHOT")</pre>
+addSbtPlugin("no.arktekk" % "sbt-cxf" % "0.1-SNAPSHOT")
+</pre>
 
 build.sbt
 <pre>seq(cxf.settings : _*)
 
-cxf.wsdls := Seq(cxf.Wsdl(file(<path to wsdl-file>), Nil, None))</pre>
+cxf.wsdls := Seq(cxf.Wsdl(file(*path to wsdl-file*), Nil, None))
+</pre>
 
