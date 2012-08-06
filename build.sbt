@@ -9,8 +9,8 @@ organization := "no.arktekk.sbt"
 version := "0.1-SNAPSHOT"
 
 aetherCredentials := {
-	val file = Path.userHome / ".sbt" / "arktekk-credentials"
-	if (file.exists()) Some(Credentials(file)) else None
+  val file = Path.userHome / ".sbt" / "arktekk-credentials"
+  if (file.exists()) Some(Credentials(file)) else None
 }
 
 deployRepository <<= (version) { version: String =>
@@ -21,6 +21,8 @@ deployRepository <<= (version) { version: String =>
   }
 
 seq(aetherSettings: _*)
+
+publish <<= aether.AetherKeys.deploy
 
 homepage := Some(new URL("http://github.com/arktekk/sbt-cxf"))
 
