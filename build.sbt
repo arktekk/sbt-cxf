@@ -8,21 +8,16 @@ organization := "no.arktekk.sbt"
 
 version := "0.1-SNAPSHOT"
 
-aetherCredentials := {
-  val file = Path.userHome / ".sbt" / "arktekk-credentials"
-  if (file.exists()) Some(Credentials(file)) else None
+credentials += Credentials(Path.userHome / ".sbt" / "arktekk-credentials")
+
+publishTo <<= (version) { version: String =>
+    if (version.trim.endsWith("SNAPSHOT"))
+      Some("Sonatype Nexus Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
+    else
+      Some("Sonatype Nexus Staging" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
 }
 
-deployRepository <<= (version) { version: String =>
-    if (version.trim.endsWith("SNAPSHOT"))
-      "Sonatype Nexus Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
-    else
-      "Sonatype Nexus Staging" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-  }
-
-seq(aetherSettings: _*)
-
-publish <<= aether.AetherKeys.deploy
+seq(aetherPublishSettings: _*)
 
 homepage := Some(new URL("http://github.com/arktekk/sbt-cxf"))
 
