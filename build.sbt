@@ -1,3 +1,5 @@
+useGpg := true
+
 sbtPlugin := true
 
 name := "sbt-cxf"
