@@ -17,16 +17,6 @@ publishTo <<= (version) { version: String =>
       Some("Sonatype Nexus Staging" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
 }
 
-seq(aetherPublishSettings: _*)
-
-coordinates <<= (organization, name, version, scalaBinaryVersion, sbtPlugin, sbtBinaryVersion).apply{
-    (o, n, v, scalaV, plugin, sbtBV) => {
-      val extra = if (plugin) ("_" + sbtBV) else ""
-      val aId = "%s_%s%s".format(n, scalaV, extra)
-      aether.MavenCoordinates(o, aId, v, None)
-  }
-}
-
 homepage := Some(new URL("http://github.com/arktekk/sbt-cxf"))
 
 startYear := Some(2011)
