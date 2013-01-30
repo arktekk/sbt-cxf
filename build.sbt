@@ -6,7 +6,7 @@ name := "sbt-cxf"
 
 organization := "no.arktekk.sbt"
 
-version := "0.3-SNAPSHOT"
+version := "0.3"
 
 credentials += Credentials(Path.userHome / ".sbt" / "arktekk-credentials")
 
