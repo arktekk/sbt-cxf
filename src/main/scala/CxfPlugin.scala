@@ -21,7 +21,7 @@ object CxfPlugin extends Plugin {
 
     val settings = Seq(
       ivyConfigurations += Config,
-      version in Config := "2.7.2",
+      version in Config := "2.7.8",
       libraryDependencies <++= (version in Config)(version => Seq[ModuleID](
         "org.apache.cxf" % "cxf-tools-wsdlto-core" % version % Config.name,
         "org.apache.cxf" % "cxf-tools-wsdlto-databinding-jaxb" % version % Config.name,
