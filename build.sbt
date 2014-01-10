@@ -8,10 +8,11 @@ organization := "no.arktekk.sbt"
 
 version := "0.4-SNAPSHOT"
 
+scriptedSettings
 
 crossBuildingSettings
 
-CrossBuilding.crossSbtVersions := Seq("0.11.0", "0.12.4", "0.13.0")
+CrossBuilding.crossSbtVersions := Seq("0.12.4", "0.13.1")
 
 credentials += Credentials(Path.userHome / ".sbt" / "arktekk-credentials")
 
