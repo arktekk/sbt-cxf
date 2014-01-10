@@ -12,7 +12,7 @@ scriptedSettings
 
 crossBuildingSettings
 
-CrossBuilding.crossSbtVersions := Seq("0.12.4", "0.13.1")
+CrossBuilding.crossSbtVersions := Seq("0.12", "0.13")
 
 credentials += Credentials(Path.userHome / ".sbt" / "arktekk-credentials")
 
