@@ -1,2 +1,3 @@
 > package
+$ exists target/scala-2.10/src_managed/cxf
 $ exists target/scala-2.10/generate_2.10-1.0.jar

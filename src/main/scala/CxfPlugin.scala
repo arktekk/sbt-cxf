@@ -10,7 +10,7 @@ object CxfPlugin extends AutoPlugin {
 
   import autoImport._
 
-  override val requires = sbt.plugins.IvyPlugin
+  override val requires = sbt.plugins.IvyPlugin && sbt.plugins.JvmPlugin
 
   override def projectSettings = Seq(
     ivyConfigurations += Cxf,
@@ -44,7 +44,7 @@ object CxfPlugin extends AutoPlugin {
       val files = x.flatten
       files
     },
-    sourceGenerators in Compile <+= wsdl2java
+    sourceGenerators in Compile += wsdl2java.taskValue
   )
 
   def callWsdl2java(id: String, output: File, args: Seq[String], classpath: Seq[File], logger: Logger) {
