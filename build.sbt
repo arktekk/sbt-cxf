@@ -6,13 +6,13 @@ name := "sbt-cxf"
 
 organization := "no.arktekk.sbt"
 
-version := "0.4-SNAPSHOT"
+scalaVersion := "2.10.5"
 
 scriptedSettings
 
-crossBuildingSettings
-
-CrossBuilding.crossSbtVersions := Seq("0.12", "0.13")
+scriptedLaunchOpts := { scriptedLaunchOpts.value ++
+  Seq("-Xmx1024M", "-XX:MaxPermSize=256M", "-Dplugin.version=" + (version in ThisBuild).value)
+}
 
 credentials += Credentials(Path.userHome / ".sbt" / "arktekk-credentials")
 
@@ -50,6 +50,11 @@ pomExtra <<= (pomExtra, name, description) {(pom, name, desc) => pom ++ xml.Grou
       <id>thoraage</id>
       <name>Thor Åge Eldby</name>
       <url>https://twitter.com/thoraageeldby</url>
+    </developer>
+    <developer>
+      <id>hamnis</id>
+      <name>Erlend Hamnaberg</name>
+      <url>https://twitter.com/hamnis</url>
     </developer>
   </developers>
 )}
